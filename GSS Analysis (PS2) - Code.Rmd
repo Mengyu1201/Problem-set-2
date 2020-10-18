@@ -1,0 +1,396 @@
+---
+title: "Canadian General Social Survey analysis and modeling"
+subtitle: "Problem Set #2"
+author: 
+  - Yangyang Liu (1003986984)
+  - Xiaoxi Bai (1004144749)  
+  - Mengyu Lei (1004735405)
+  - Yuika Cho (1003213186)  
+date: "October 19, 2020"
+fontsize: 12pt
+output: pdf_document
+abstract: "There are four people working on problem set 2. In this problem set, readers can find data analysis and regression modeling according to 2017 Canadian General Social Survey (GSS in the rest of text) data set. 2017 Cycle 31 GSS data set is about family survey, and it was downloaded from University of Toronto Library and cleaned by gss_cleaning.R module provided in the problem set 2 package. Readers are able to find social/family issues from important statistical analysis below. Another goal of this problem set is to build up linear regression model in order to investigate linear relationship between Age and some other predictors."
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+
+\section{1. Introduction}
+
+Family plays an important role in people's live. In the recent decades, Canadian keep focusing on family issues and observe that families are becoming more divergent. Hence, the goal of this survey is to do some data analysis on GSS family data as well as monitoring relationship between __Age__ and other family factors by using linear model.  
+
+
+Before starting data analytic and linear regression modeling, we will present overview of this group work in the introduction section. In this section, readers can have a preview of structure of article from data and modeling perspective.  
+First of all, 2017 Canadian GSS on family data set is downloaded from University of Toronto library CHASS. Data set contains responses of sample survey with cross-sectional design from February 2017 to November 2017. The survey's target population is all person greater than 15 years old living in 10 different provinces in Canada. Targets of the survey are knowing more about Canadian families and capture potential social/family issues in the future.  In raw GSS data set, there are 20602 observations and 461 different attributes (either continuous or categorical). After proceeding GSS cleaning module, it generates a tidier GSS data includes 81 different variables and 20602 records. In this article, all data analysis and linear regression modeling will be based on this tidy GSS data.  
+Secondly, in this article, linear regression model will be introduced and used to monitoring relationship between __Age__ and other family factors, because _Age_ is a continuous variable. In addition to _Age_, there are 80 attributes left in the GSS data set, but selected predictors are _marital status_, _average working hours_, _income family_, and _self rated health_. These four predictors are carefully selected because they are four of the most important factors to a family, and they are representative for investigating family issues.  
+Thirdly, we will present to readers some quantitative numbers, graphs and summary of data analysis and linear regression modeling results.  
+Finally, conclusions will be made from data analysis and linear regression modeling results. At the same time, weaknesses and corresponding next step plan will also be presented and explained.  
+
+
+
+\section{2. Data}
+
+
+2017 Canadian GSS on family data set is downloaded from University of Toronto library CHASS. The reason we select it is because this is an official survey data set by Statistic Canada, and it can reflect real Canadian family/social issues and worth to analyze.  According to 2017 Canadian GSS on family data set user guide (_Reference_), there are few purposes of Canadian General Social Survey on family:  
+
+  * To have a better understanding of families in Canada by answering few family matter questions. For example: How many families are there in Canada? What are their characteristics and socio-economic conditions? and etc.  
+  * To reveal some potential social/family issues of matter of current interest.  
+  * Predicting and analyzing social/family changes in the living conditions and well-being of Canadians over time.  
+  
+Moreover, there are few **features** of GSS data set that we are going to analyze:  
+
+  * The survey's target population is all person greater than 15 years old living in 10 different provinces in Canada.  
+  * Survey is conducted through telephone, hence the population frame should be all person greater than 15 years old living in 10 different provinces in Canada and have telephone (landline and cellular).  
+  * In the tidy GSS data set, most of attributes are categorical variables, for example, _marital status_, _average working hours_, _income family_, and _self rated health_.  
+  
+At the same time, there are still existing some **drawbacks** in GSS data set:  
+
+  * Since responses of survey were collected through telephone (landline and cellular), which is not a popular way nowadays. GSS Data is subject to both sampling and non-sampling errors.  
+  * One of data features says that most of attributes are categorical, however, some continuous attributes are also be classified into different categories , for example: _income family_, _income respondent_ and etc. Such kind of classification may cause some biases when doing data analysis.  
+  * There are lots of missing values, so that we are choosing to ignore in this article.  
+  
+
+\section{3. Model}
+
+
+The goal of this article is to investigate relationship between and _Age_ and _marital status_, _average working hours_, _income family_, and _self rated health_. In this part, Linear Regression Model will be briefly introduced with model definition and model diagnostics.  
+
+
+\subsection{3.1 Model Definition}
+
+Linear regression model is a linear model that measures linear relationship between dependent variable (Y) and independent variables (X). Here Y need to be a continuous variable and X can be either continuous or categorical variable. Assume that there a $n$ independent variables, mathematically, linear regression can be expressed as: 
+
+\begin{equation}
+    y = \beta_0 + \beta_1x_1 + \beta_2x_2 + ... 
+              + \beta_nx_n + \epsilon
+\end{equation}
+
+where $\beta_i$ are estimated coefficient of each independent variable, interpretation of $\beta_i$: With one unit change of $x_i$ causes $\beta_i$ unit changes in y.  
+
+$\epsilon$ is residual term of this linear regression model. 
+
+
+\subsection{3.2 Model Diagnostic}
+
+Linear regression model doesn't work all the time, there are few assumptions need to be met for linear regression model:  
+
+  * Linearity: The relationship between independent variables and the mean of dependent variable is linear. This assumption can be diagnosed by checking scatter (pair) plot between x and y.  
+  * Multicollinearity: Predictors cannot have many correlations (multicollinearity).
+  * Residual must be normally distributed: This can be tested by Quantile-Quantile Plot.  
+  * Homoscedasticity: Residual must consistent across all variables, this can be tested by checking residual plot of linear regression.  
+  * Outliers and Influential points: Check outliers and influential points that have bad impact on linear regression model.  
+  
+
+\subsection{3.3 Model Special Cases and caveats}
+
+For the linear regression model that will be used to analyze GSS data set, all independent variables (x) are categorical variables, so we  hypothesize the relationship between independent variables and the mean of dependent variable is linear and there is no multicollinearity exists. At the same time, there are few caveats about the linear regression model in this article. Our model may not meet all model criterion, for example, Homoscedasticity doesn't meet or there are some bad outliers and Influential points can impact our analysis.
+
+
+
+\newpage
+
+
+\section{4. Results}
+
+In this section, data analysis and modeling results will be presented to reader. The section will be divided into two sub-sections, one is about data summary by showing box plots and some important statistic numbers (five number summary, mean and variance). The other section is about linear regression model results and summary.  
+
+\subsection{4.1 Data Analysis} 
+
+
+```{r,eval = TRUE, echo=FALSE, warning=FALSE, message=FALSE,fig.width=10, fig.height=8}
+library(janitor)
+library(tidyverse)
+library(ggplot2)
+library(ggpubr)
+
+# Read Data
+Data <- read_csv("gss.csv")
+
+theme_set(theme_pubr())
+
+figure1 <- Data %>% ggplot(aes(x=marital_status, y=age)) +
+  geom_boxplot(aes(color = marital_status)) + 
+  labs(title = "Boxplot of Age against marital status",y = 'Age',tag = "Figure 1") + 
+  theme(axis.text.x = element_text(face="bold", color="#993333", 
+                           size=5),
+          axis.text.y = element_text(face="bold", color="#993333", 
+                           size=5),
+          axis.title = element_text(face="bold", size = 5),
+          legend.title = element_text(size = 10),
+          legend.text = element_text(size = 5),
+          axis.title.x = element_text(size = 15),
+          axis.title.y = element_text(size = 15),
+          plot.margin = unit(c(0.3,0.3,0.3,0.3),"cm")
+        )
+
+subtitle <- paste0(
+"This table shows minimum, 25% quantile, median, mean",
+"75% quantile, maximum and variance of age in each marital status's category"
+) %>%
+ strwrap(width = 80) %>%
+ paste(collapse = "\n")
+
+table1 <- Data %>% group_by(marital_status) %>% 
+  summarise(Count = n(), Minimum = min(age), Q1 = quantile(age,0.25), 
+            Median = quantile(age,0.5), Mean = round(mean(age),2),
+            Q3 = quantile(age,0.75), Maximum=max(age), 
+            VAR = round(var(age),2)) %>%
+  arrange(desc(Count)) %>% 
+  ggtexttable(rows = NULL, 
+              theme = ttheme(base_style = "classic",
+                             base_size = 12)
+) %>% tab_add_title(text = subtitle, face = "plain", size = 10) %>%
+  tab_add_title(text = "Table 1", face = "bold", 
+                    size = 12, padding = unit(1.5, "line"))
+
+ggarrange(figure1, table1,
+          ncol = 1, nrow = 2,
+          heights = c(1,1))                                            
+
+```
+From figure 1 and table 1, we present box plot between age and marital status and statistical numbers of each marital status's category. 9500 people are married with minimum 20 years old to maximum 80 years old. There are also seven several missing values. _Widowed_ have the biggest median and mean but smallest variance, from figure1, we can tell that most of widowed person are between 70 year old and 80 years old.  
+
+
+```{r,eval = TRUE, echo=FALSE, warning=FALSE, message=FALSE,fig.width=10, fig.height=8}
+
+theme_set(theme_pubr())
+
+figure2 <- Data %>% ggplot(aes(x=average_hours_worked, y=age)) +
+  geom_boxplot(aes(color = average_hours_worked)) + 
+  labs(title = "Boxplot of Age against average working hours",y = 'Age',tag = "Figure 2") + 
+  theme(axis.text.x = element_text(face="bold", color="#993333", 
+                           size=5),
+          axis.text.y = element_text(face="bold", color="#993333", 
+                           size=5),
+          axis.title = element_text(face="bold", size = 5),
+          legend.title = element_text(size = 10),
+          legend.text = element_text(size = 5),
+          axis.title.x = element_text(size = 15),
+          axis.title.y = element_text(size = 15),
+          plot.margin = unit(c(0.3,0.3,0.3,0.3),"cm")
+        )
+
+subtitle <- paste0(
+"This table shows minimum, 25% quantile, median, mean, 75% quantile",
+"maximum and variance of age in each average working hours's category"
+) %>%
+ strwrap(width = 80) %>%
+ paste(collapse = "\n")
+
+table2 <- Data %>% group_by(average_hours_worked) %>% 
+  summarise(Count = n(), Minimum = min(age), Q1 = quantile(age,0.25), 
+            Median = quantile(age,0.5), Mean = round(mean(age),2),
+            Q3 = quantile(age,0.75), Maximum=max(age), 
+            VAR = round(var(age),2)) %>%
+  arrange(desc(Count)) %>% 
+  ggtexttable(rows = NULL, 
+              theme = ttheme(base_style = "classic",
+                             base_size = 12)
+) %>% tab_add_title(text = subtitle, face = "plain", size = 10) %>%
+  tab_add_title(text = "Table 2", face = "bold", 
+                    size = 12, padding = unit(1.5, "line"))
+
+ggarrange(figure2, table2,
+          ncol = 1, nrow = 2,
+          heights = c(1,1))                                            
+
+```
+
+
+From figure 2 and table 2, we present box plot between age and average working hours and statistical numbers of each average working hours' category. 8200 people are working between 30 to 40 hours with minimum 15 years old to maximum 80 years old. There are 7100 missing values under this attributes, _average working hours_ under these missing values have the biggest median and mean and variance.
+
+
+```{r,eval = TRUE, echo=FALSE, warning=FALSE, message=FALSE,fig.width=10, fig.height=8}
+
+theme_set(theme_pubr())
+
+figure3 <- Data %>% ggplot(aes(x=income_family, y=age)) +
+  geom_boxplot(aes(color = income_family)) + 
+  labs(title = "Boxplot of Age against family income",y = 'Age',tag = "Figure 3") + 
+  theme(axis.text.x = element_text(face="bold", color="#993333", 
+                           size=5),
+          axis.text.y = element_text(face="bold", color="#993333", 
+                           size=5),
+          axis.title = element_text(face="bold", size = 5),
+          legend.title = element_text(size = 10),
+          legend.text = element_text(size = 5),
+          axis.title.x = element_text(size = 15),
+          axis.title.y = element_text(size = 15),
+          plot.margin = unit(c(0.3,0.3,0.3,0.3),"cm")
+        )
+
+subtitle <- paste0(
+"This table shows minimum, 25% quantile, median, mean, 75% quantile",
+"maximum and variance of age in each family income's category"
+) %>%
+ strwrap(width = 80) %>%
+ paste(collapse = "\n")
+
+table3 <- Data %>% group_by(income_family) %>% 
+  summarise(Count = n(), Minimum = min(age), Q1 = quantile(age,0.25), 
+            Median = quantile(age,0.5), Mean = round(mean(age),2),
+            Q3 = quantile(age,0.75), Maximum=max(age), 
+            VAR = round(var(age),2)) %>%
+  arrange(desc(Count)) %>% 
+  ggtexttable(rows = NULL, 
+              theme = ttheme(base_style = "classic",
+                             base_size = 12)
+) %>% tab_add_title(text = subtitle, face = "plain", size = 10) %>%
+  tab_add_title(text = "Table 3", face = "bold", 
+                    size = 12, padding = unit(1.5, "line"))
+
+ggarrange(figure3, table3,
+          ncol = 1, nrow = 2,
+          heights = c(1,1))                                            
+
+```
+
+
+From figure 3 and table 3, we present box plot between age and family income and statistical numbers of each average working hours' category. 4700 people have family income greater than $125,000 with minimum 15 years old to maximum 80 years old. There are no missing values under this attributes, _family income_ among different categories has similar median, mean and variance. And from boxplot, we can tell under _family income_, age are approximately normal distributed.  
+
+
+```{r,eval = TRUE, echo=FALSE, warning=FALSE, message=FALSE,fig.width=10, fig.height=8}
+
+theme_set(theme_pubr())
+
+figure4 <- Data %>% ggplot(aes(x=self_rated_health, y=age)) +
+  geom_boxplot(aes(color = self_rated_health)) + 
+  labs(title = "Boxplot of Age against self rated health",y = 'Age',tag = "Figure 4") + 
+  theme(axis.text.x = element_text(face="bold", color="#993333", 
+                           size=5),
+          axis.text.y = element_text(face="bold", color="#993333", 
+                           size=5),
+          axis.title = element_text(face="bold", size = 5),
+          legend.title = element_text(size = 10),
+          legend.text = element_text(size = 5),
+          axis.title.x = element_text(size = 15),
+          axis.title.y = element_text(size = 15),
+          plot.margin = unit(c(0.3,0.3,0.3,0.3),"cm")
+        )
+
+subtitle <- paste0(
+"This table shows minimum, 25% quantile, median, mean, 75% quantile",
+"maximum and variance of age in each self rated health's category"
+) %>%
+ strwrap(width = 80) %>%
+ paste(collapse = "\n")
+
+table4 <- Data %>% group_by(self_rated_health) %>% 
+  summarise(Count = n(), Minimum = min(age), Q1 = quantile(age,0.25), 
+            Median = quantile(age,0.5), Mean = round(mean(age),2),
+            Q3 = quantile(age,0.75), Maximum=max(age), 
+            VAR = round(var(age),2)) %>%
+  arrange(desc(Count)) %>% 
+  ggtexttable(rows = NULL, 
+              theme = ttheme(base_style = "classic",
+                             base_size = 12)
+) %>% tab_add_title(text = subtitle, face = "plain", size = 10) %>%
+  tab_add_title(text = "Table 4", face = "bold", 
+                    size = 12, padding = unit(1.5, "line"))
+
+ggarrange(figure4, table4,
+          ncol = 1, nrow = 2,
+          heights = c(1,1))                                            
+
+```
+
+
+From figure 4 and table 4, we present box plot between age and self rated health and statistical numbers of each self rated health's category. 7000 people have very good health with minimum 15 years old to maximum 80 years old. There are 99 missing values under this attributes, _good_ health condition has higher median, mean. And from boxplot, we can tell under most of _family income_ categories, age are right-skewed.  
+
+
+\newpage
+
+
+\subsection{4.2 Model Results}
+
+\subsubsection{4.2.1 Linear Regression Coefficient}
+```{r,eval = TRUE, echo=FALSE, warning=FALSE, message=FALSE}
+
+Linear <- lm(age ~ marital_status + average_hours_worked + income_family +
+               self_rated_health, data = Data)
+
+
+Linear$coefficients %>% data.frame() %>% 
+  knitr::kable(format="latex")
+```
+
+From Linear Regression Model coefficient table above, our linear regression model with estimated parameters is:
+
+\begin{equation}
+    Age = 63.5 - 12.86Marital_{Common\_law}+...-6.3self\_rated\_health_{very\_good}
+\end{equation}  
+
+That means, for people under common law marital status, these people are about 12.86 younger than others. For people who married, they are about 5 younger than others. For people who think they have very good health condition, they are about 6 younger than others. Other predictors can be explained as the same way.  
+
+\newpage
+
+\subsubsection{4.2.2 Linear Regression Model Diagnostic}
+
+```{r,eval = TRUE, echo=FALSE, warning=FALSE, message=FALSE}
+library(car)
+
+res <- rstudent(Linear)
+pred <- predict(Linear)
+
+par(mfrow=c(1,2))
+qqPlot(Linear, ylab = "Residuals of Regression Model")
+plot(res ~ pred, type = "p", xlab = "Fitted Values", 
+     ylab = "Standardized Residual", main = "Standardized Residual Plot")
+
+```
+
+
+From above model Diagnostic, readers can find residuals are approximately normal distribution. However, residuals are not constant over the fitted values( _Age_ ), that means Homoscedasticity doesn't meet in the linear regression model.
+
+
+\newpage
+
+
+\section{5. Discussion}
+
+From data analysis and linear regression model results, we can conclude that _marital status_ is the most important factor that impact response variable : _age_. Further, we can also conclude that for young people (less than 30 years old), many of them never married, working 0.1 to 29.9 hours and excellent health condition. For old people (more than 60 years old), many of them are widowed, doesn't have enough working hours information, and poor health condition. Whole article explained our original goal about investigating relationship between _Age_ and _marital status_, _average working hours_, _income family_, and _self rated health_. In the following sub-sections, we will present some Weaknesses of our study and corresponding further steps.  
+
+
+\subsection{5.1 Weaknesses}
+
+There are few Weaknesses that can cause our analysis less accurate or bias from real situations.  
+
+  1. There are many missing data in the GSS data set as well as in our interested variables, but data imputation was not processed for those missing data.  
+  
+  2. Back to the survey, we know it subject to both sampling errors and non-sampling errors from GSS user document. As a result, data analysis and regression modeling also have some errors because of the survey.  
+  
+  3. After model diagnostics, we found that not all assumptions of linear regression model are satisfied. Also some other model assumptions need to be checked and clarified more clearly.  
+  
+
+\subsection{5.2 Next Steps}
+
+After realizing some weaknesses of our analysis in this article, we also listed further steps about how to improve performance of data analysis and regression modeling.  
+
+  1. For many missing value in GSS data set, data imputation is necessary by either collecting more response or classify these missing values into existing categories.  
+  
+  2. In order to minimize both sampling errors and non-sampling errors according to GSS user document, it is better to diversify ways of conducting survey or investigate real biased term and present to readers.  
+  
+  3. For linear regression model, we will do a further diagnostics from model assumptions, model prediction (Accuracy) and bad influential points perspectives. We diagnose linear regression model has heteroscedastic (non-constant error) and non-linearity issues , we will do some model transformation in order to meet all model requirements.
+  
+  
+  
+\newpage
+
+
+\section{Reference}
+
+Wu, Changbao. Thompson. 2020. "Sampling Theory and Practice. Springer International Publishing".  
+
+Statistic Canada. April, 2019. "Public Use Microdata File Documentation and User's Guide".  
+
+Alvin C.Rencher and G. Bruce Schaalje, 2007. "Linear Models In Statistics".  
+
+Marina Soley-Bori, 2013. "Dealing with missing data: Key assumptions and methods for applied analysis"
+
+
+
+
+
