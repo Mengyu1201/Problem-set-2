@@ -390,7 +390,6 @@ Alvin C.Rencher and G. Bruce Schaalje, 2007. "Linear Models In Statistics".
 
 Marina Soley-Bori, 2013. "Dealing with missing data: Key assumptions and methods for applied analysis"
 
-
-
+Rohan Alexander and Sam Caetano. 2020. "gss_cleaning.R".
 
 
